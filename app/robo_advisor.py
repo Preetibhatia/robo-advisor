@@ -1,7 +1,20 @@
 # app/robo_advisor.py
 
+check = False
+
+while check==False:
+    input_symbol = input("Enter Stock symbol, e.g. 'MSFT, AAPL, GOOG, AMZN':  ")
+    if input_symbol not in ('MSFT, AAPL, GOOG, AMZN'):
+        print("Oh, expecting a properly-formed stock symbol like 'MSFT'. Please try again.")
+        check = False
+    else:
+        check = True
+
+
+
+
 print("-------------------------")
-print("SELECTED SYMBOL: XYZ")
+print("SELECTED SYMBOL: ", input_symbol)
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
 print("REQUEST AT: 2018-02-20 02:00pm")
