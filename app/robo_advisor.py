@@ -2,10 +2,12 @@
 
 import requests
 import json 
+import datetime
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-
-
-
+API_KEY = os.environ["ALPHAVANTAGE_API_KEY"]
 
 #implementing user input validation logic
 check = False
@@ -18,53 +20,57 @@ while check==False:
         check = True
 
 #using requests package to access the API
-####how to pass user input in symbol?
 ####if symbol not found return msg "Sorry, couldn't find any trading data for that stock symbol" and exit prog 
-####how to save the key in .env
-#symbol=input_symbol
 
-request_url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&outputsize=full&apikey=LGHZLDVZZQO2HO56"
+request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={input_symbol}&outputsize=full&apikey={API_KEY}"
 response = requests.get(request_url)
-
 parsed_response = json.loads(response.text)
-#print(parsed_response["Meta Data"])
-#print(parsed_response["Time Series (Daily)"])
-parsed_response_list= []
+
+tsd=parsed_response["Time Series (Daily)"]
+
 #1998-12-23': {'1. open': '140.3800', '2. high': '143.8100', '3. low': '139.3800', '4. close': '143.5600', '5. volume': '8735000'}
 
+rows = []
+for date, daily_prices in tsd.items(): 
+    row = {
+        "timestamp": date,
+        "open": float(daily_prices["1. open"]),
+        "high": float(daily_prices["2. high"]),
+        "low": float(daily_prices["3. low"]),
+        "close": float(daily_prices["4. close"]),
+        "volume": int(daily_prices["5. volume"])
+        }
+    rows.append(row)
 
 
-for key, value in parsed_response.items():
-    temp = [key,value]
-    parsed_response_list.append(temp)
 
-print(parsed_response_list)
+#{'timestamp': '2019-06-19', 'open': 1105.6, 'high': 1107.0, 'low': 1093.48, 'close': 1102.33, 'volume': 1338575}
+time_now = datetime.datetime.now() 
+def to_usd(my_price):
+    # utility function to convert float or integer to usd-formatted string (for printing)
+    return "${0:,.2f}".format(my_price) #> $12,000.71
 
-
-#breakpoint()
-r=[]
-
-
-
-
-for p in parsed_response_list:
-    r.append(p['Time Series (Daily)'])
-
-#Key LGHZLDVZZQO2HO56
-
-
+latest_day = rows[0]['timestamp']
+last_close = rows[0]['close']
+high =[]
+low =[]
+for p in rows:
+    high.append(p['high'])
+    low.append(p['low'])
+recent_high = max(high)
+recent_low = min(low)
 
 
 print("-------------------------")
 print("SELECTED SYMBOL: ", input_symbol)
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
-print("REQUEST AT: 2018-02-20 02:00pm")
+print("REQUEST AT: ", time_now)
 print("-------------------------")
-print("LATEST DAY: 2018-02-20")
-print("LATEST CLOSE: $100,000.00")
-print("RECENT HIGH: $101,000.00")
-print("RECENT LOW: $99,000.00")
+print("LATEST DAY: ", latest_day)
+print("LATEST CLOSE: ", to_usd(last_close))
+print("RECENT HIGH: ", to_usd(recent_high))
+print("RECENT LOW: ", to_usd(recent_low))
 print("-------------------------")
 print("RECOMMENDATION: BUY!")
 print("RECOMMENDATION REASON: TODO")
