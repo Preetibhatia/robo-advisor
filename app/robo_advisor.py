@@ -11,21 +11,25 @@ load_dotenv()
 API_KEY = os.environ["ALPHAVANTAGE_API_KEY"]
 
 #implementing user input validation logic
-check = False
-while check==False:
-    input_symbol = input("Enter Stock symbol, e.g. 'MSFT, AAPL, GOOG, AMZN':  ")
-    if input_symbol not in ('MSFT, AAPL, GOOG, AMZN, AXP'):
-        print("Oh, expecting a properly-formed stock symbol like 'MSFT'. Please try again.")
-        check = False
-    else:
-        check = True
+# check = False
+# while check==False:
+#     input_symbol = input("Enter Stock symbol, e.g. 'MSFT, AAPL, GOOG, AMZN':  ")
+#     if input_symbol not in ('MSFT, AAPL, GOOG, AMZN, AXP'):
+#         print("Oh, expecting a properly-formed stock symbol like 'MSFT'. Please try again.")
+#         check = False
+#     else:
+#         check = True
 
 #using requests package to access the API
 ####if symbol not found return msg "Sorry, couldn't find any trading data for that stock symbol" and exit prog 
 def get_response(symbol):
+    
     request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={input_symbol}&outputsize=full&apikey={API_KEY}"
     response = requests.get(request_url)
     parsed_response = json.loads(response.text)
+    if "Error Message" in parsed_response:
+        print("Sorry, couldn't find any trading data for that symbol")
+        exit()
     return parsed_response
 
 #1998-12-23': {'1. open': '140.3800', '2. high': '143.8100', '3. low': '139.3800', '4. close': '143.5600', '5. volume': '8735000'}
@@ -47,10 +51,10 @@ def transform_response(parsed_response):
 
 #main program
 if __name__ == "__main__":
-time_now = datetime.datetime.now() 
-input_symbol = input("Please specify stock symbol (e.g AMZN) and press enter: ")
-parsed_response = get_response(input_symbol)
-tsd = transform_response(parsed_response)
+    time_now = datetime.datetime.now() 
+    input_symbol = input("Please specify stock symbol (e.g AMZN) and press enter: ")
+    parsed_response = get_response(input_symbol)
+    tsd = transform_response(parsed_response)
 
 #{'timestamp': '2019-06-19', 'open': 1105.6, 'high': 1107.0, 'low': 1093.48, 'close': 1102.33, 'volume': 1338575}
 
@@ -58,15 +62,23 @@ def to_usd(my_price):
     # utility function to convert float or integer to usd-formatted string (for printing)
     return "${0:,.2f}".format(my_price) #> $12,000.71
 
-latest_day = rows[0]['timestamp']
-last_close = rows[0]['close']
+latest_day = tsd[0]['timestamp']
+last_close = tsd[0]['close']
 high =[]
 low =[]
-for p in rows:
-    high.append(p['high'])
-    low.append(p['low'])
+
+i=0
+while (i<100):
+    
+    for p in tsd:
+        high.append(p['high'])
+        low.append(p['low'])
+        break
+    i=i+1
+breakpoint()
 recent_high = max(high)
 recent_low = min(low)
+
 
 
 print("-------------------------")
