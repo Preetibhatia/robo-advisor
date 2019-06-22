@@ -7,7 +7,7 @@ import csv
 from dotenv import load_dotenv
 import os
 #import statistics
-import pandas as df
+import pandas as pd
 load_dotenv()
 
 
@@ -73,10 +73,22 @@ for p in tsd:
 recent_high = max(high)
 recent_low = min(low)
 
-q=[]
-q = df.DataFrame(tsd)
-if last_close > df.q.quantile(0.9):
-    print("go for it!")
+#BUY-SELL Logic
+#df_high = pd.DataFrame(i['high'] for i in tsd)
+#df_low = pd.DataFrame(i['low'] for i in tsd)
+df_high = pd.DataFrame(high)
+df_low = pd.DataFrame(low)
+high_percentile= df_high.quantile(0.8)
+low_percentile =df_low.quantile(0.9)
+
+
+if (int(last_close) > int(high_percentile)) and (int(last_close)>int(low_percentile)):
+    buy = "SELL!!"
+    reason = "Price today is higher than 80 percentile of Recent High and Recent Low"
+else:
+    buy = "BUY!!"
+    reason = "Price today is lower than 80 percentile of Recent High"
+
 
 
 
@@ -95,8 +107,8 @@ print("LATEST CLOSE: ", to_usd(last_close))
 print("RECENT HIGH: ", to_usd(recent_high))
 print("RECENT LOW: ", to_usd(recent_low))
 print("-------------------------")
-print("RECOMMENDATION: BUY!")
-print("RECOMMENDATION REASON: TODO")
+print("RECOMMENDATION: ", buy)
+print("RECOMMENDATION REASON: ", reason)
 print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
