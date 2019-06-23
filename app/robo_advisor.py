@@ -21,9 +21,21 @@ def get_response(symbol):
     request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={input_symbol}&outputsize=compact&apikey={API_KEY}"
     response = requests.get(request_url)
     parsed_response = json.loads(response.text)
-    if "Error Message" in parsed_response:
-        print("Sorry, couldn't find any trading data for that symbol")
+    if input_symbol.isdigit():
+        print("Oh, input symbol shouldn't be a number, enter a stock symbol like 'MSFT'. Please try again.")
         exit()
+    elif "Error Message" in parsed_response:
+        print("Sorry, couldn't find any trading data for that symbol")
+        exit() 
+    # try:
+    #     val = int(input_symbol)
+    #     print("Oh, expecting a properly-formed stock symbol like 'MSFT'. Please try again.")
+    #     exit()
+    # # except ValueError:
+    # #     print("That's not an int!")
+    # #     print("No.. input string is not an Integer. It's a string"):
+    # #     pass
+
     return parsed_response
 
 #1998-12-23': {'1. open': '140.3800', '2. high': '143.8100', '3. low': '139.3800', '4. close': '143.5600', '5. volume': '8735000'}
@@ -84,7 +96,7 @@ low_percentile =df_low.quantile(0.9)
 
 if (int(last_close) > int(high_percentile)) and (int(last_close)>int(low_percentile)):
     buy = "SELL!!"
-    reason = "Price today is higher than 80 percentile of Recent High and Recent Low"
+    reason = "Price today is higher than 80 percentile of Recent High"
 else:
     buy = "BUY!!"
     reason = "Price today is lower than 80 percentile of Recent High"
