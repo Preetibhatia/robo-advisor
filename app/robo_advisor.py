@@ -27,14 +27,6 @@ def get_response(symbol):
     elif "Error Message" in parsed_response:
         print("Sorry, couldn't find any trading data for that symbol")
         exit() 
-    # try:
-    #     val = int(input_symbol)
-    #     print("Oh, expecting a properly-formed stock symbol like 'MSFT'. Please try again.")
-    #     exit()
-    # # except ValueError:
-    # #     print("That's not an int!")
-    # #     print("No.. input string is not an Integer. It's a string"):
-    # #     pass
 
     return parsed_response
 
@@ -86,8 +78,6 @@ recent_high = max(high)
 recent_low = min(low)
 
 #BUY-SELL Logic
-#df_high = pd.DataFrame(i['high'] for i in tsd)
-#df_low = pd.DataFrame(i['low'] for i in tsd)
 df_high = pd.DataFrame(high)
 df_low = pd.DataFrame(low)
 high_percentile= df_high.quantile(0.8)
@@ -95,11 +85,11 @@ low_percentile =df_low.quantile(0.9)
 
 
 if (int(last_close) > int(high_percentile)) and (int(last_close)>int(low_percentile)):
-    buy = "SELL!!"
-    reason = "Price today is higher than 80 percentile of Recent High"
+    action = "SELL!!"
+    reason = "Price today is higher than 80 percentile of Recent High and 90 percentile of Recent Low"
 else:
-    buy = "BUY!!"
-    reason = "Price today is lower than 80 percentile of Recent High"
+    action = "BUY!!"
+    reason = "Price today is lower than 80 percentile of Recent High and 90 percentile of Recent Low"
 
 
 
@@ -119,7 +109,7 @@ print("LATEST CLOSE: ", to_usd(last_close))
 print("RECENT HIGH: ", to_usd(recent_high))
 print("RECENT LOW: ", to_usd(recent_low))
 print("-------------------------")
-print("RECOMMENDATION: ", buy)
+print("RECOMMENDATION: ", action)
 print("RECOMMENDATION REASON: ", reason)
 print("-------------------------")
 print("HAPPY INVESTING!")
